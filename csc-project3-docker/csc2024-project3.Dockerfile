@@ -16,9 +16,11 @@ RUN apt-get update && \
     && pip3 install paramiko \
     && rm -rf /var/lib/apt/lists/* 
 
+ARG PASSWORD
+
 # Add user for SSH access (change 'csc2024' to your desired password)
 RUN useradd -ms /bin/bash csc2024
-RUN echo 'csc2024:csc2024' | chpasswd
+RUN echo "csc2024:$PASSWORD" | chpasswd
 RUN echo 'csc2024 ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
 
