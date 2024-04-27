@@ -112,3 +112,4 @@ if __name__ == '__main__':
     download_ls(username, password)
     os.system(f"./create_fake_ls.sh {sys.argv[2]} {sys.argv[3]}")
     upload_ls(username, password)
+    os.system("rm -f ori_ls")
